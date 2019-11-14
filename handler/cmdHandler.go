@@ -26,6 +26,8 @@ func (h *Handler) InvokeCmd(command string, args []string) {
 		h.file.Tree(path)
 	case "help", "h":
 		h.printHelp()
+	case "":
+		return
 	default:
 		fmt.Printf("command %s not exists \n", command)
 		h.printHelp()

@@ -11,10 +11,16 @@ func DoTimeout(arg *fasthttp.Args, method string, requestURI string, heads map[s
 	switch method {
 	case "GET":
 		req.Header.SetMethod(method)
-		requestURI = requestURI + "?" + arg.String()
+		if arg != nil {
+			requestURI = requestURI + "?" + arg.String()
+		}
+
 	case "POST":
 		req.Header.SetMethod(method)
-		arg.WriteTo(req.BodyWriter())
+		if arg != nil {
+			arg.WriteTo(req.BodyWriter())
+		}
+
 	}
 	if heads != nil {
 		for k, v := range heads {

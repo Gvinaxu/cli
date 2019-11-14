@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Gvinaxu/cli/handler"
+	"github.com/Gvinaxu/cli/task"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -25,8 +26,8 @@ const (
 \  \:\__/\_\/\__\/  \:\/:/|  |:| /  /\\  \:\\__\/  |:|/:/
  \  \:\ \:\       \__\::/ |  |:|/  /:/ \  \:\   |  |:/:/ 
   \  \:\/:/       /  /:/  |__|:|__/:/   \  \:\  |__|::/  
-   \  \::/       /__/:/    \__\::::/     \  \:\ /__/:/   
-    \__\/        \__\/         ~~~~       \__\/ \__\/        	%s
+   \  \::/       /__/:/    \__\____/     \  \:\ /__/:/   
+    \__\/        \__\/                    \__\/ \__\/        	%s
 	
 Know its white, keep its black
 %s
@@ -35,12 +36,30 @@ ______________________________
 `
 )
 
-var (
-	h *handler.Handler
-)
-
 func main() {
-	checkUser()
+	app := &App{}
+	app.Start()
+	app.Run()
+}
+
+type App struct {
+	h       *handler.Handler
+	account *handler.Account
+	tm      *task.Maintainer
+}
+
+func (a *App) Start() {
+	a.account = a.checkUser()
+
+	f := &handler.FileReq{}
+	a.h = handler.NewHandler(f)
+
+	a.tm = task.NewTaskMaintainer(a.account)
+	a.tm.Start()
+}
+
+func (a *App) Run() {
+
 	fmt.Printf(Banner, Version, Website)
 
 	f := bufio.NewReader(os.Stdin)
@@ -50,7 +69,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		command, args, err := getCommandAndArgs(line)
+		command, args, err := a.getCommandAndArgs(line)
 		if err != nil {
 			continue
 		}
@@ -58,16 +77,11 @@ func main() {
 			fmt.Println("bye!")
 			break
 		}
-		h.InvokeCmd(command, args)
+		a.h.InvokeCmd(command, args)
 	}
 }
 
-func init() {
-	f := &handler.FileReq{}
-	h = handler.NewHandler(f)
-}
-
-func getCommandAndArgs(line string) (command string, args []string, err error) {
+func (a *App) getCommandAndArgs(line string) (command string, args []string, err error) {
 	line = strings.TrimSpace(line)
 	all := strings.Split(line, " ")
 	if len(all) == 0 {
@@ -86,7 +100,7 @@ func getCommandAndArgs(line string) (command string, args []string, err error) {
 	return all[0], args, nil
 }
 
-func checkUser() {
+func (a *App) checkUser() *handler.Account {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter Gavln User Name: ")
 	name, err := reader.ReadString('\n')
@@ -106,4 +120,5 @@ func checkUser() {
 	if err != nil {
 		panic(err)
 	}
+	return account
 }

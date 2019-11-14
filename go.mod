@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/klauspost/compress v1.9.1 // indirect
 	github.com/urfave/cli v1.22.1
 	github.com/valyala/fasthttp v1.6.0
