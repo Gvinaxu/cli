@@ -17,6 +17,7 @@ func NewHandler(file *FileReq) *Handler {
 
 func (h *Handler) InvokeCmd(command string, args []string) {
 	cmd := strings.ToLower(command)
+
 	var err error
 	switch cmd {
 	case "tree", "t":

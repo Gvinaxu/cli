@@ -61,16 +61,24 @@ func (a *App) Start() {
 func (a *App) Run() {
 
 	fmt.Printf(Banner, Version, Website)
-
+	history := make([]string, 0)
 	f := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print(">>> ")
+
 		line, err := f.ReadString('\n')
 		if err != nil {
 			panic(err)
 		}
+		history = append(history, line)
 		command, args, err := a.getCommandAndArgs(line)
 		if err != nil {
+			continue
+		}
+		if command == "history" {
+			for i, v := range history {
+				fmt.Printf("%d		%s", i, v)
+			}
 			continue
 		}
 		if command == "quit" {
